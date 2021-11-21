@@ -1,18 +1,20 @@
-import sys, sqlite3
-from PyQt5 import uic
+import sys
+import sqlite3
+from UI.addEditCoffeeForm import Ui_Form
+from UI.main_ui import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.QtWidgets import QTableWidgetItem, QHeaderView
 
 
-class App(QMainWindow):
+class App(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('main.ui', self)
+        self.setupUi(self)
 
         self.pushButton.clicked.connect(self.load)
         self.pushButton_2.clicked.connect(self.addEdit)
 
-        con = sqlite3.connect('coffee.sqlite')
+        con = sqlite3.connect('data/coffee.sqlite')
         cur = con.cursor()
         self.coffee = cur.execute("""SELECT * FROM coffee""").fetchall()
         con.close()
@@ -43,12 +45,12 @@ class App(QMainWindow):
         self.aE.show()
 
 
-class AddEditWindow(QWidget):
+class AddEditWindow(QWidget, Ui_Form):
     def __init__(self, parent):
         super().__init__()
+        self.setupUi(self)
         self.parent = parent
         self.rowCount = len(self.parent.coffee)
-        uic.loadUi('addEditCoffeeForm.ui', self)
         self.pushButton.setEnabled(False)
         self.pushButton_2.setEnabled(True)
         self.spinBox.setValue(1)
@@ -88,7 +90,7 @@ class AddEditWindow(QWidget):
             self.lineEdit_5.setText('')
 
     def insert(self):
-        con = sqlite3.connect('coffee.sqlite')
+        con = sqlite3.connect('data/coffee.sqlite')
         cur = con.cursor()
         cur.execute(f"""INSERT INTO coffee(id, name, roasting, type,
                 description, cost, size) VALUES({self.spinBox.value()},
@@ -102,7 +104,7 @@ class AddEditWindow(QWidget):
         self.close()
 
     def edit(self):
-        con = sqlite3.connect('coffee.sqlite')
+        con = sqlite3.connect('data/coffee.sqlite')
         cur = con.cursor()
         cur.execute(f"""UPDATE coffee SET name = '{self.lineEdit.text()}',
         roasting = '{self.lineEdit_2.text()}',
